@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace TCMAPI.Models
 {
-    public class UserModel
+    [Table("LineUser")]
+    public class LineUser
     {
         public int Id { get; set; }
         public string LineUserId { get; set; }
-        public string AppUserId { get; set; }
         public string UserStatus { get; set; }
-
-        [DataType(DataType.Date)]
         public DateTime CreateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
+
     }
 }

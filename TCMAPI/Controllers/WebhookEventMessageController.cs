@@ -8,9 +8,9 @@ using TCMAPI.Models;
 
 namespace TCMAPI.Controllers
 {
-    [Route("")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class EventMessageController : ControllerBase
+    public class WebhookEventMessageController : ControllerBase
     {
         [HttpGet]
         public IActionResult Get()
@@ -21,8 +21,10 @@ namespace TCMAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] RootEventMessage val)
         {
+            var result = "no action";
             var userId = val.events.Select(x => x.source.userId).FirstOrDefault().ToString();
             var messageType = val.events.Select(x => x.type).FirstOrDefault().ToString();
+
             switch (messageType)
             {
                 case "message":
@@ -32,8 +34,9 @@ namespace TCMAPI.Controllers
                     {
                         using (var db = new DataContext())
                         {
-                            db.UserModels.Add(new UserModel { Id = 1, AppUserId = "0001", LineUserId = userId, UserStatus = "Followed", CreateDate = DateTime.Now.Date });
+                            db.LineUsers.Add(new LineUser { LineUserId = userId, UserStatus = "Followed", CreateDate = DateTime.Now.Date });
                             db.SaveChanges();
+                            result = userId;
                             break;
                         }
                     }
@@ -43,17 +46,28 @@ namespace TCMAPI.Controllers
                     }
                     
                 case "unfollow":
-                    break;
+                    try
+                    {
+                        using (var db = new DataContext())
+                        {
+                            db.LineUsers.Remove(db.LineUsers.Where(x => x.LineUserId == userId).FirstOrDefault());
+                            db.SaveChanges();
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError, ex.Message);
+                    }
+                    
                 case "postback":
-                    break;
-                case "videoPlayComplete":
                     break;
                 case "things":
                     break;
                 default:
                     break;
             }
-            return Ok();
+            return Ok(result);
         }
 
     }
