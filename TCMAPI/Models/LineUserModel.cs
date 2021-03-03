@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace TCMAPI.Models
 {
     [Table("LineUser")]
-    public class LineUser
+    public class LineUserModel
     {
         public int Id { get; set; }
         public string LineUserId { get; set; }

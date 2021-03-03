@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TCMAPI.Models
 {
-    public class RootEventMessage
+    public class RootEventMessageModel
     {
         public string destination { get; set; }
         public List<Event> events { get; set; }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TCMAPI.Models
 {
-    public class RichMenuModel
+    public class RootRichMenuModel
     {
         public class Size
         {
@@ -34,13 +34,11 @@ namespace TCMAPI.Models
             public Action action { get; set; }
         }
 
-        public class Root
-        {
             public Size size { get; set; }
             public bool selected { get; set; }
             public string name { get; set; }
             public string chatBarText { get; set; }
             public List<Area> areas { get; set; }
-        }
+            public string refId { get; set; } 
     }
 }

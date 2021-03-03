@@ -19,7 +19,7 @@ namespace TCMAPI.Controllers
         }
         // POST api/EventMessage
         [HttpPost]
-        public IActionResult Post([FromBody] RootEventMessage val)
+        public IActionResult Post([FromBody] RootEventMessageModel val)
         {
             var result = "no action";
             var userId = val.events.Select(x => x.source.userId).FirstOrDefault().ToString();
@@ -34,7 +34,7 @@ namespace TCMAPI.Controllers
                     {
                         using (var db = new DataContext())
                         {
-                            db.LineUsers.Add(new LineUser { LineUserId = userId, UserStatus = "Followed", CreateDate = DateTime.Now.Date });
+                            db.LineUsers.Add(new LineUserModel { LineUserId = userId, UserStatus = "Followed", CreateDate = DateTime.Now.Date });
                             db.SaveChanges();
                             result = userId;
                             break;

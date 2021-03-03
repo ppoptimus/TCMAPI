@@ -12,6 +12,6 @@ namespace TCMAPI.Data
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite("Data Source=ApiData.db");
 
-        public DbSet<LineUser> LineUsers { get; set; }
+        public DbSet<LineUserModel> LineUsers { get; set; }
     }
 }
