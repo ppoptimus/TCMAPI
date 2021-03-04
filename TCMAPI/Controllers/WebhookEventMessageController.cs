@@ -34,7 +34,7 @@ namespace TCMAPI.Controllers
                     {
                         using (var db = new DataContext())
                         {
-                            db.LineUsers.Add(new LineUserModel { LineUserId = userId, UserStatus = "Followed", CreateDate = DateTime.Now.Date });
+                            db.LineUsers.Add(new LineUser { LineUserId = userId, UserStatus = "Followed", CreateDate = DateTime.Now.Date });
                             db.SaveChanges();
                             result = userId;
                             break;
