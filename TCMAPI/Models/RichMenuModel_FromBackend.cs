@@ -40,5 +40,6 @@ namespace TCMAPI.Models
         public string chatBarText { get; set; }
         public List<Area> areas { get; set; }
         public string img { get; set; }
+        public bool setDefault { get; set; }
     }
 }

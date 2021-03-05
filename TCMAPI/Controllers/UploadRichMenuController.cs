@@ -30,7 +30,6 @@ namespace TCMAPI.Controllers
             return new string[] { "Test", "Success" };
         }
 
-        // GET api/<RichMenuController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
@@ -41,29 +40,33 @@ namespace TCMAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] RichMenuModel_FromBackend val)
         {
-          
             var result = "";
+            var resultFromUploadImage = "";
+            var resultFromSetDeaultMenu = "";
             var key = "";
             var menuId = "";
             var imageBase64 = val.img;
+            bool isSetDefault = val.setDefault;
             try
             {
-                var returnText = CreateRichMenu(val);
+                result = CreateRichMenu(val);
                 
-                dynamic value = JsonConvert.DeserializeObject(returnText);
+                dynamic value = JsonConvert.DeserializeObject(result);
                 foreach (JProperty item in value)
                 {
                     key = item.Name;
                     menuId = (string)item.Value;
                 }
-
-                if(key == "richMenuId")
+                
+                if (key == "richMenuId")
                 {
-                    result = UploadImageRichMenu(menuId, imageBase64);
-                    if (result != "Success")
+                    resultFromUploadImage = UploadImageRichMenu(menuId, imageBase64);
+                    resultFromSetDeaultMenu = SetDefaultMenu(menuId);
+                    if (resultFromUploadImage != "Success" || resultFromSetDeaultMenu != "Success")
                     {
-                        return NotFound(result);
+                        return NotFound(string.Join(resultFromUploadImage, " ", resultFromSetDeaultMenu));
                     }
+                    
                 }
                 else
                 {
@@ -95,21 +98,6 @@ namespace TCMAPI.Controllers
                 request.AddParameter("application/json",output, ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
                 result = response.Content;
-
-                //HttpStatusCode statusCode = response.StatusCode;
-                //if ((int)statusCode == 200)
-                //{
-                //    dynamic value = JsonConvert.DeserializeObject(response.Content);
-                //    foreach(JProperty item in value)
-                //    {
-                //        var key = item.Name;
-                //    }
-                //    result = value.richMenuId;
-                //}
-                //else
-                //{
-                //    result = response.Content;
-                //}
                 
             }
             catch (Exception ex)
@@ -122,9 +110,9 @@ namespace TCMAPI.Controllers
         protected string UploadImageRichMenu(string menuId, string imgBase64)
         {
             string result = "Success";
-            string AppSettingUrl = appSettings.Value.UploadImageUrl;
-            string UploadImageUrl = String.Format(AppSettingUrl, menuId);
-            var client = new RestClient(UploadImageUrl);
+            string appSettingUrl = appSettings.Value.UploadImageUrl;
+            string uploadImageUrl = String.Format(appSettingUrl, menuId);
+            var client = new RestClient(uploadImageUrl);
             var request = new RestRequest(Method.POST);
             byte[] bytes = System.Convert.FromBase64String(imgBase64);
 
@@ -134,6 +122,31 @@ namespace TCMAPI.Controllers
                 request.AddHeader("Authorization", lineAccessToken);
                 request.AddParameter("image/jpeg", bytes, ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+            return result;
+        }
+        protected string SetDefaultMenu(string menuId)
+        {
+            string result = "Success";
+            string appSettingUrl = appSettings.Value.SetDefaultMenu;
+            string setDefaultMenu = String.Format(appSettingUrl, menuId);
+            var client = new RestClient(setDefaultMenu);
+            var request = new RestRequest(Method.POST);
+            try
+            {
+                request.AddHeader("Authorization", lineAccessToken);
+                IRestResponse response = client.Execute(request);
+
+                HttpStatusCode statusCode = response.StatusCode;
+                if ((int)statusCode != 200)
+                {
+                    result = response.Content;
+                }
+                
             }
             catch (Exception ex)
             {

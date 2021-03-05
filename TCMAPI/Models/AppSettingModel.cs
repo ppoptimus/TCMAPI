@@ -12,5 +12,6 @@ namespace TCMAPI.Models
         public string LineChannelSecret { get; set; }
         public string LineChannelAccessToken { get; set; }
         public string UploadImageUrl { get; set; }
+        public string SetDefaultMenu { get; set; }
     }
 }
