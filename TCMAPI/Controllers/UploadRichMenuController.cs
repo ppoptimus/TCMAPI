@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using TCMAPI.Models;
 
@@ -22,19 +20,6 @@ namespace TCMAPI.Controllers
             appSettings = app;
             lineAccessToken = appSettings.Value.LineChannelAccessToken;
     }
-
-        // GET: api/<RichMenuController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "Test", "Success" };
-        }
-
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
 
         // POST api/<RichMenuController>
         [HttpPost]
@@ -61,7 +46,7 @@ namespace TCMAPI.Controllers
                 if (key == "richMenuId")
                 {
                     resultFromUploadImage = UploadImageRichMenu(menuId, imageBase64);
-                    resultFromSetDeaultMenu = SetDefaultMenu(menuId);
+                    resultFromSetDeaultMenu = (isSetDefault) ? SetDefaultMenu(menuId) : "";
                     if (resultFromUploadImage != "Success" || resultFromSetDeaultMenu != "Success")
                     {
                         return NotFound(string.Join(resultFromUploadImage, " ", resultFromSetDeaultMenu));

@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace TCMAPI.Models
 {
-    public class RichMenuModel_ToLine
+    public class RichMenuRichModel
     {
+        public List<Richmenu> richmenus { get; set; }
         public class Size
         {
             public int width { get; set; }
@@ -34,11 +35,15 @@ namespace TCMAPI.Models
             public Action action { get; set; }
         }
 
-        public Size size { get; set; }
-        public bool selected { get; set; }
-        public string name { get; set; }
-        public string chatBarText { get; set; }
-        public List<Area> areas { get; set; }
-
+        public class Richmenu
+        {
+            public string richMenuId { get; set; }
+            public string name { get; set; }
+            public Size size { get; set; }
+            public string chatBarText { get; set; }
+            public bool selected { get; set; }
+            public List<Area> areas { get; set; }
+        }
+           
     }
 }
