@@ -15,5 +15,6 @@ namespace TCMAPI.Models
         public string SetDefaultMenu { get; set; }
         public string LinkRichMenuToUser { get; set; }
         public string LinkRichmenuToMultipleUser { get; set; }
+        public string DeleteRichMenu { get; set; }
     }
 }

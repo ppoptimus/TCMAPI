@@ -46,7 +46,7 @@ namespace TCMAPI.Controllers
                 if (key == "richMenuId")
                 {
                     resultFromUploadImage = UploadImageRichMenu(menuId, imageBase64);
-                    resultFromSetDeaultMenu = (isSetDefault) ? SetDefaultMenu(menuId) : "";
+                    resultFromSetDeaultMenu = (isSetDefault) ? SetDefaultMenu(menuId) : "Success";
                     if (resultFromUploadImage != "Success" || resultFromSetDeaultMenu != "Success")
                     {
                         return NotFound(string.Join(resultFromUploadImage, " ", resultFromSetDeaultMenu));
