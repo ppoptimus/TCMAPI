@@ -1,18 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using NLog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace TCMAPI.Controllers
 {
-    [Route("")]
+    [Route("api/[controller]")]
     [ApiController]
     public class HomeController : ControllerBase
     {
+        private Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        
+        [HttpGet]
         public IActionResult Get()
         {
+            _logger.Info(DateTime.Now.ToString());
             return Ok("Connected");
         }
     }

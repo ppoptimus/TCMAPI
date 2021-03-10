@@ -19,7 +19,7 @@ namespace TCMAPI.Controllers
         {
             appSettings = app;
             lineAccessToken = appSettings.Value.LineChannelAccessToken;
-    }
+        }
 
         // POST api/<RichMenuController>
         [HttpPost]

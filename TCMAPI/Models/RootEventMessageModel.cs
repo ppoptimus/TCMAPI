@@ -53,7 +53,17 @@ namespace TCMAPI.Models
         public long timestamp { get; set; }
         public Source source { get; set; }
         public Message message { get; set; }
+        public Postback postback { get; set; }
     }
 
+    public class Postback
+    {
+        public string data { get; set; }
+        public Params @params { get; set; }
+    }
 
+    public class Params
+    {
+        public string datetime { get; set; }
+    }
 }
