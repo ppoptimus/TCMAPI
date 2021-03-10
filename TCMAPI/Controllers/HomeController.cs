@@ -4,7 +4,7 @@ using System;
 
 namespace TCMAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("")]
     [ApiController]
     public class HomeController : ControllerBase
     {
