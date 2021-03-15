@@ -41,6 +41,10 @@ namespace TCMAPI.Models
         public string id { get; set; }
         public string type { get; set; }
         public string text { get; set; }
+        public string title { get; set; }
+        public string address { get; set; }
+        public double? latitude { get; set; }
+        public double? longitude { get; set; }
         public List<Emoji> emojis { get; set; }
         public Mention mention { get; set; }
     }

@@ -25,13 +25,14 @@ namespace TCMAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] RichMenuModel_FromBackend val)
         {
+            bool isSetDefault = false;
             var result = "";
             var resultFromUploadImage = "";
             var resultFromSetDeaultMenu = "";
             var key = "";
             var menuId = "";
             var imageBase64 = val.img;
-            bool isSetDefault = val.setDefault;
+            isSetDefault = val.setDefault;
             try
             {
                 result = CreateRichMenu(val);

@@ -17,5 +17,6 @@ namespace TCMAPI.Models
         public string LinkRichmenuToMultipleUser { get; set; }
         public string DeleteRichMenu { get; set; }
         public string PushFlexMessageUrl { get; set; }
+        public string BroadcastMessageUrl { get; set; }
     }
 }

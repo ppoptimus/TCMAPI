@@ -32,15 +32,24 @@ namespace TCMAPI.Controllers
             var result = "no action";
             var userId = val.events.Select(x => x.source.userId).FirstOrDefault().ToString();
             var messageType = val.events.Select(x => x.type).FirstOrDefault().ToString();
+            var @type = "";
+            double? latitude, longitude;
 
             switch (messageType)
             {
                 case "message":
-                    if(val.events.Select(x=>x.message.text == "Q").First())
+                    dynamic message = val.events.Select(x => x.message);
+                    foreach (var item in message)
                     {
-                        result = PushFlexMessageQ(userId);
+                        @type = item.@type.ToString();
                     }
-                    
+                    if (@type == "location")
+                    {
+                        latitude = val.events.Select(x => x.message.latitude).First();
+                        longitude = val.events.Select(x => x.message.longitude).First();
+                        result = PushFlexLocation(userId);
+                    }
+
                     break;
                 case "follow":
                     try
@@ -55,9 +64,9 @@ namespace TCMAPI.Controllers
                     }
                     catch (Exception ex)
                     {
-                        return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError,ex.Message);
+                        return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError, ex.Message);
                     }
-                    
+
                 case "unfollow":
                     try
                     {
@@ -72,13 +81,13 @@ namespace TCMAPI.Controllers
                     {
                         return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError, ex.Message);
                     }
-                    
+
                 case "postback":
                     if (val.events.Select(x => x.postback.data == "Q").First())
                     {
                         result = PushFlexMessageQ(userId);
                     }
-                    else if(val.events.Select(x => x.postback.data == "C").First())
+                    else if (val.events.Select(x => x.postback.data == "C").First())
                     {
                         result = PushFlexMessageC(userId);
                     }
@@ -90,9 +99,11 @@ namespace TCMAPI.Controllers
                     {
                         result = PushFlexMessageBenefits(userId);
                     }
+                    else if (val.events.Select(x => x.postback.data == "location").First())
+                    {
+                        result = SendActionLocation(userId);
+                    }
 
-                    break;
-                case "things":
                     break;
                 default:
                     break;
@@ -111,7 +122,7 @@ namespace TCMAPI.Controllers
             {
                 request.AddHeader("Content-Type", "application/json");
                 request.AddHeader("Authorization", appSettings.Value.LineChannelAccessToken);
-                request.AddParameter("application/json", "{\r\n    \"to\": \""+ userId + "\",\r\n    \"messages\": [\r\n        {\r\n            \"type\": \"flex\",\r\n            \"altText\": \"this is a flex message\",\r\n            \"contents\": {\r\n  \"type\": \"carousel\",\r\n  \"contents\": [\r\n    {\r\n      \"type\": \"bubble\",\r\n      \"size\": \"kilo\",\r\n      \"hero\": {\r\n        \"type\": \"image\",\r\n        \"url\": \"https://www.img.in.th/images/9f2fd4cee8bba418d9c8bc115fe89e6a.jpg\",\r\n        \"flex\": 1,\r\n        \"size\": \"full\",\r\n        \"aspectRatio\": \"20:13\",\r\n        \"aspectMode\": \"cover\",\r\n        \"backgroundColor\": \"#FFFFFFFF\",\r\n        \"action\": {\r\n          \"type\": \"uri\",\r\n          \"label\": \"Line\",\r\n          \"uri\": \"https://linecorp.com/\"\r\n        }\r\n      },\r\n      \"body\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"text\",\r\n            \"text\": \"คำถามพบบ่อย\",\r\n            \"weight\": \"bold\",\r\n            \"size\": \"xl\",\r\n            \"color\": \"#000000\",\r\n            \"contents\": []\r\n          }\r\n        ]\r\n      },\r\n      \"footer\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"flex\": 0,\r\n        \"spacing\": \"sm\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ขั้นตอนสมัคร ม.33\",\r\n              \"uri\": \"https://linecorp.com/\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ขั้นตอนสมัคร ม.39\",\r\n              \"uri\": \"https://linecorp.com\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ขั้นตอนสมัคร ม.40\",\r\n              \"uri\": \"https://linecorp.com\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"spacer\"\r\n          }\r\n        ]\r\n      }\r\n    },\r\n    {\r\n      \"type\": \"bubble\",\r\n      \"size\": \"kilo\",\r\n      \"hero\": {\r\n        \"type\": \"image\",\r\n        \"url\": \"https://www.img.in.th/images/b854e386ee61d1a2ffeb6b137202e1fa.jpg\",\r\n        \"flex\": 1,\r\n        \"size\": \"full\",\r\n        \"aspectRatio\": \"20:13\",\r\n        \"aspectMode\": \"cover\",\r\n        \"backgroundColor\": \"#FFFFFFFF\",\r\n        \"action\": {\r\n          \"type\": \"uri\",\r\n          \"label\": \"Line\",\r\n          \"uri\": \"tel:1506\"\r\n        }\r\n      },\r\n      \"body\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"text\",\r\n            \"text\": \"ติดต่อประกันสังคม\",\r\n            \"weight\": \"bold\",\r\n            \"size\": \"xl\",\r\n            \"color\": \"#000000\",\r\n            \"contents\": []\r\n          }\r\n        ]\r\n      },\r\n      \"footer\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"flex\": 0,\r\n        \"spacing\": \"sm\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"สายด่วน 1506\",\r\n              \"uri\": \"tel:1506\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ส่งอีเมลติดต่อ\",\r\n              \"uri\": \"https://linecorp.com\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"postback\",\r\n              \"label\": \"ค้นหาที่ทำการ\",\r\n              \"data\": \"location\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"spacer\"\r\n          }\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}\r\n        }\r\n    ]\r\n}", ParameterType.RequestBody);
+                request.AddParameter("application/json", "{\r\n    \"to\": \"" + userId + "\",\r\n    \"messages\": [\r\n        {\r\n            \"type\": \"flex\",\r\n            \"altText\": \"this is a flex message\",\r\n            \"contents\": {\r\n  \"type\": \"carousel\",\r\n  \"contents\": [\r\n    {\r\n      \"type\": \"bubble\",\r\n      \"size\": \"kilo\",\r\n      \"hero\": {\r\n        \"type\": \"image\",\r\n        \"url\": \"https://www.img.in.th/images/9f2fd4cee8bba418d9c8bc115fe89e6a.jpg\",\r\n        \"flex\": 1,\r\n        \"size\": \"full\",\r\n        \"aspectRatio\": \"20:13\",\r\n        \"aspectMode\": \"cover\",\r\n        \"backgroundColor\": \"#FFFFFFFF\",\r\n        \"action\": {\r\n          \"type\": \"uri\",\r\n          \"label\": \"Line\",\r\n          \"uri\": \"https://linecorp.com/\"\r\n        }\r\n      },\r\n      \"body\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"text\",\r\n            \"text\": \"คำถามพบบ่อย\",\r\n            \"weight\": \"bold\",\r\n            \"size\": \"xl\",\r\n            \"color\": \"#000000\",\r\n            \"contents\": []\r\n          }\r\n        ]\r\n      },\r\n      \"footer\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"flex\": 0,\r\n        \"spacing\": \"sm\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ขั้นตอนสมัคร ม.33\",\r\n              \"uri\": \"https://linecorp.com/\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ขั้นตอนสมัคร ม.39\",\r\n              \"uri\": \"https://linecorp.com\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ขั้นตอนสมัคร ม.40\",\r\n              \"uri\": \"https://linecorp.com\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"spacer\"\r\n          }\r\n        ]\r\n      }\r\n    },\r\n    {\r\n      \"type\": \"bubble\",\r\n      \"size\": \"kilo\",\r\n      \"hero\": {\r\n        \"type\": \"image\",\r\n        \"url\": \"https://www.img.in.th/images/b854e386ee61d1a2ffeb6b137202e1fa.jpg\",\r\n        \"flex\": 1,\r\n        \"size\": \"full\",\r\n        \"aspectRatio\": \"20:13\",\r\n        \"aspectMode\": \"cover\",\r\n        \"backgroundColor\": \"#FFFFFFFF\",\r\n        \"action\": {\r\n          \"type\": \"uri\",\r\n          \"label\": \"Line\",\r\n          \"uri\": \"tel:1506\"\r\n        }\r\n      },\r\n      \"body\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"text\",\r\n            \"text\": \"ติดต่อประกันสังคม\",\r\n            \"weight\": \"bold\",\r\n            \"size\": \"xl\",\r\n            \"color\": \"#000000\",\r\n            \"contents\": []\r\n          }\r\n        ]\r\n      },\r\n      \"footer\": {\r\n        \"type\": \"box\",\r\n        \"layout\": \"vertical\",\r\n        \"flex\": 0,\r\n        \"spacing\": \"sm\",\r\n        \"contents\": [\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"สายด่วน 1506\",\r\n              \"uri\": \"tel:1506\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"uri\",\r\n              \"label\": \"ส่งอีเมลติดต่อ\",\r\n              \"uri\": \"https://linecorp.com\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"button\",\r\n            \"action\": {\r\n              \"type\": \"postback\",\r\n              \"label\": \"ค้นหาที่ทำการ\",\r\n              \"data\": \"location\"\r\n            },\r\n            \"height\": \"sm\",\r\n            \"style\": \"primary\"\r\n          },\r\n          {\r\n            \"type\": \"spacer\"\r\n          }\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}\r\n        }\r\n    ]\r\n}", ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
 
                 HttpStatusCode statusCode = response.StatusCode;
@@ -205,6 +216,60 @@ namespace TCMAPI.Controllers
             {
                 result = ex.Message;
             }
+            return result;
+        }
+
+        protected string SendActionLocation(string userId)
+        {
+            string result = "OK";
+            string CreateRichMenu = appSettings.Value.PushFlexMessageUrl;
+            var client = new RestClient(CreateRichMenu);
+            var request = new RestRequest(Method.POST);
+            try
+            {
+                request.AddHeader("Content-Type", "application/json");
+                request.AddHeader("Authorization", appSettings.Value.LineChannelAccessToken);
+                request.AddParameter("application/json", "{\r\n \"to\": \"" + userId + "\",\r\n \"messages\": [\r\n  {\r\n   \"type\": \"text\",\r\n   \"text\": \"คลิกปุ่ม \\\"Your location\\\" ด้านล่างเพื่อค้นหาสถานที่ใกล้เคียง\",\r\n   \"quickReply\": {\r\n    \"items\": [\r\n     {\r\n      \"type\": \"action\",\r\n      \"action\": {\r\n       \"type\":\"location\",\r\n       \"label\":\"Your location\"\r\n      }\r\n     }\r\n    ]\r\n   }\r\n  }\r\n ]\r\n}", ParameterType.RequestBody);
+                IRestResponse response = client.Execute(request);
+
+                HttpStatusCode statusCode = response.StatusCode;
+                if ((int)statusCode != 200)
+                {
+                    result = response.Content;
+                }
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+            return result;
+        }
+
+        protected string PushFlexLocation(string userId)
+        {
+            string result = "OK";
+
+            string CreateRichMenu = appSettings.Value.PushFlexMessageUrl;
+            var client = new RestClient(CreateRichMenu);
+            var request = new RestRequest(Method.POST);
+            try
+            {
+                request.AddHeader("Content-Type", "application/json");
+                request.AddHeader("Authorization", appSettings.Value.LineChannelAccessToken);
+                request.AddParameter("application/json", "{\r\n    \"to\": \"" + userId + "\",\r\n    \"messages\": [\r\n        {\r\n            \"type\": \"flex\",\r\n            \"altText\": \"this is a flex message\",\r\n            \"contents\": {\r\n                \"type\": \"carousel\",\r\n                \"contents\": [\r\n                    {\r\n                        \"type\": \"bubble\",\r\n                        \"hero\": {\r\n                            \"type\": \"image\",\r\n                            \"url\": \"https://lh5.googleusercontent.com/p/AF1QipO-N3DgdZK2KJ_v6EtpQfLiIsLj8miNkPykOJrP=w195-h120-p-k-no\",\r\n                            \"size\": \"full\",\r\n                            \"aspectRatio\": \"20:13\",\r\n                            \"aspectMode\": \"cover\"\r\n                        },\r\n                        \"body\": {\r\n                            \"type\": \"box\",\r\n                            \"layout\": \"vertical\",\r\n                            \"action\": {\r\n                                \"type\": \"uri\",\r\n                                \"uri\": \"https://www.google.co.th/maps/place/Social+Security+Office/@13.8349791,100.5155056,13z/data=!4m8!1m2!2m1!1z4Liq4Liy4LiC4Liy4Lib4Lij4Liw4LiB4Lix4LiZ4Liq4Lix4LiH4LiE4Lih!3m4!1s0x30e29b61170f0de5:0x2a0d152da72dc9d4!8m2!3d13.8455254!4d100.525599?hl=en&authuser=0\"\r\n                            },\r\n                            \"contents\": [\r\n                                {\r\n                                    \"type\": \"text\",\r\n                                    \"text\": \"สำนักงานประกันสังคม\",\r\n                                    \"weight\": \"bold\",\r\n                                    \"size\": \"xl\",\r\n                                    \"contents\": []\r\n                                },\r\n                                {\r\n                                    \"type\": \"box\",\r\n                                    \"layout\": \"vertical\",\r\n                                    \"spacing\": \"sm\",\r\n                                    \"margin\": \"lg\",\r\n                                    \"contents\": [\r\n                                        {\r\n                                            \"type\": \"box\",\r\n                                            \"layout\": \"baseline\",\r\n                                            \"spacing\": \"sm\",\r\n                                            \"contents\": [\r\n                                                {\r\n                                                    \"type\": \"text\",\r\n                                                    \"text\": \"ที่อยู่\",\r\n                                                    \"size\": \"sm\",\r\n                                                    \"color\": \"#AAAAAA\",\r\n                                                    \"flex\": 1,\r\n                                                    \"contents\": []\r\n                                                },\r\n                                                {\r\n                                                    \"type\": \"text\",\r\n                                                    \"text\": \"ตำบล ตลาดขวัญ อำเภอเมืองนนทบุรี นนทบุรี 11000\",\r\n                                                    \"size\": \"sm\",\r\n                                                    \"color\": \"#666666\",\r\n                                                    \"flex\": 5,\r\n                                                    \"wrap\": true,\r\n                                                    \"contents\": []\r\n                                                }\r\n                                            ]\r\n                                        }\r\n                                    ]\r\n                                }\r\n                            ]\r\n                        }\r\n                    },\r\n                    {\r\n                        \"type\": \"bubble\",\r\n                        \"hero\": {\r\n                            \"type\": \"image\",\r\n                            \"url\": \"https://lh5.googleusercontent.com/p/AF1QipODN1RYKr25pPRCxFx5CRvh9hpnxbPaakyShO9x=w195-h120-p-k-no\",\r\n                            \"size\": \"full\",\r\n                            \"aspectRatio\": \"20:13\",\r\n                            \"aspectMode\": \"cover\"\r\n                        },\r\n                        \"body\": {\r\n                            \"type\": \"box\",\r\n                            \"layout\": \"vertical\",\r\n                            \"action\": {\r\n                                \"type\": \"uri\",\r\n                                \"uri\": \"https://www.google.co.th/maps/place/Social+Security+Bangkok+Office+Area+2/@13.8349791,100.5155056,13z/data=!4m8!1m2!2m1!1z4Liq4Liy4LiC4Liy4Lib4Lij4Liw4LiB4Lix4LiZ4Liq4Lix4LiH4LiE4Lih!3m4!1s0x30e29c964eb21e01:0xd76ff362a3fad4cd!8m2!3d13.8466847!4d100.5435452?hl=en&authuser=0\"\r\n                            },\r\n                            \"contents\": [\r\n                                {\r\n                                    \"type\": \"text\",\r\n                                    \"text\": \"สำนักงานประกันสังคมกรุงเทพมหานครพื้นที่ 2\",\r\n                                    \"weight\": \"bold\",\r\n                                    \"size\": \"xl\",\r\n                                    \"contents\": []\r\n                                },\r\n                                {\r\n                                    \"type\": \"box\",\r\n                                    \"layout\": \"vertical\",\r\n                                    \"spacing\": \"sm\",\r\n                                    \"margin\": \"lg\",\r\n                                    \"contents\": [\r\n                                        {\r\n                                            \"type\": \"box\",\r\n                                            \"layout\": \"baseline\",\r\n                                            \"spacing\": \"sm\",\r\n                                            \"contents\": [\r\n                                                {\r\n                                                    \"type\": \"text\",\r\n                                                    \"text\": \"ที่อยู่\",\r\n                                                    \"size\": \"sm\",\r\n                                                    \"color\": \"#AAAAAA\",\r\n                                                    \"flex\": 1,\r\n                                                    \"contents\": []\r\n                                                },\r\n                                                {\r\n                                                    \"type\": \"text\",\r\n                                                    \"text\": \"แขวง ลาดยาว เขตจตุจักร กรุงเทพมหานคร 10900\",\r\n                                                    \"size\": \"sm\",\r\n                                                    \"color\": \"#666666\",\r\n                                                    \"flex\": 5,\r\n                                                    \"wrap\": true,\r\n                                                    \"contents\": []\r\n                                                }\r\n                                            ]\r\n                                        }\r\n                                    ]\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}", ParameterType.RequestBody);
+                IRestResponse response = client.Execute(request);
+
+                HttpStatusCode statusCode = response.StatusCode;
+                if ((int)statusCode != 200)
+                {
+                    result = response.Content;
+                }
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
             return result;
         }
 
