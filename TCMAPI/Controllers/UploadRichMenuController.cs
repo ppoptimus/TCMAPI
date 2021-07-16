@@ -21,70 +21,66 @@ namespace TCMAPI.Controllers
             lineAccessToken = appSettings.Value.LineChannelAccessToken;
         }
 
-        // POST api/<RichMenuController>
         [HttpPost]
         public IActionResult Post([FromBody] RichMenuModel_FromBackend val)
         {
-            bool isSetDefault = false;
-            var result = "";
-            var resultFromUploadImage = "";
-            var resultFromSetDeaultMenu = "";
             var key = "";
             var menuId = "";
             var imageBase64 = val.img;
-            isSetDefault = val.setDefault;
+            bool isSetDefault = val.setDefault;
+            string result;
             try
             {
                 result = CreateRichMenu(val);
-                
+
                 dynamic value = JsonConvert.DeserializeObject(result);
                 foreach (JProperty item in value)
                 {
                     key = item.Name;
                     menuId = (string)item.Value;
                 }
-                
+
                 if (key == "richMenuId")
                 {
-                    resultFromUploadImage = UploadImageRichMenu(menuId, imageBase64);
-                    resultFromSetDeaultMenu = (isSetDefault) ? SetDefaultMenu(menuId) : "Success";
+                    string resultFromUploadImage = UploadImageRichMenu(menuId, imageBase64);
+                    string resultFromSetDeaultMenu = (isSetDefault) ? SetDefaultMenu(menuId) : "Success";
                     if (resultFromUploadImage != "Success" || resultFromSetDeaultMenu != "Success")
                     {
                         return NotFound(string.Join(resultFromUploadImage, " ", resultFromSetDeaultMenu));
                     }
-                    
+
                 }
                 else
                 {
                     return NotFound(menuId);
                 }
-                
+
             }
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
             }
-            
+
             return Ok(result);
         }
-
         protected string CreateRichMenu(RichMenuModel_FromBackend val)
         {
-            string result = "";
+            val.img = "";
             string CreateRichMenu = appSettings.Value.CreateRichMenuUrl;
             var client = new RestClient(CreateRichMenu);
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
 
+            string result;
             try
             {
                 string output = JsonConvert.SerializeObject(val);
                 request.AddHeader("Content-Type", "application/json");
                 request.AddHeader("Authorization", lineAccessToken);
-                request.AddParameter("application/json",output, ParameterType.RequestBody);
+                request.AddParameter("application/json", output, ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
                 result = response.Content;
-                
+
             }
             catch (Exception ex)
             {
