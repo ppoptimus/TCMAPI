@@ -8,6 +8,7 @@ namespace TCMAPI.Models
     public class AppSettingModel
     {
         public string GetRichMenuListUrl { get; set; }
+        public string GetDefaultRichMenuIDUrl { get; set; }
         public string CreateRichMenuUrl { get; set; }
         public string LineChannelSecret { get; set; }
         public string LineChannelAccessToken { get; set; }

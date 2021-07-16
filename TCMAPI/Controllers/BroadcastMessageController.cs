@@ -27,14 +27,8 @@ namespace TCMAPI.Controllers
             return new string[] { "status", "connected" };
         }
 
-        // GET api/<BroadcastMessageController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "no value";
-        }
-
-        // POST api/<BroadcastMessageController>
+        
+        // POST api/BroadcastMessage
         [HttpPost]
         public IActionResult Post([FromBody] BroadcastMessageModel val)
         {
