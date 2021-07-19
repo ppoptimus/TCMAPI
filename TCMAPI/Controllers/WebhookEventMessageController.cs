@@ -49,7 +49,12 @@ namespace TCMAPI.Controllers
                         longitude = val.events.Select(x => x.message.longitude).First();
                         result = PushFlexLocation(userId);
                     }
-
+                    else if (@type == "text")
+                    {
+                        //latitude = val.events.Select(x => x.message.latitude).First();
+                        //longitude = val.events.Select(x => x.message.longitude).First();
+                        result = PushFlexMessageQ(userId);
+                    }
                     break;
                 case "follow":
                     try

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NLog;
+using System;
 
 namespace TCMAPI.Controllers
 {
@@ -12,8 +13,7 @@ namespace TCMAPI.Controllers
         [HttpGet]
         public ContentResult Get()
         {
-            //_logger.Info(DateTime.Now.ToString());
-            //return Ok("Connected");
+            _logger.Info(DateTime.Now.ToString());
 
             return new ContentResult
             {
