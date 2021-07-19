@@ -24,8 +24,7 @@ namespace TCMAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] string val)
         {
-            var result = "";
-            result = SetDefaultMenu(val);
+            var result = SetDefaultMenu(val);
             return Ok(result);
         }
 
