@@ -36,7 +36,7 @@ namespace TCMAPI.Controllers
                 }
             }
             
-            return Accepted(result);
+            return Ok(result);
         }
 
         protected string LinkMenuToMultiple(string json)
