@@ -1,50 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using TCMAPI.Models;
 
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TCMAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BroadcastMessageController : ControllerBase
+    public class PushMessageController : ControllerBase
     {
         private readonly IOptions<AppSettingModel> appSettings;
-        public BroadcastMessageController(IOptions<AppSettingModel> app)
+        public PushMessageController(IOptions<AppSettingModel> app)
         {
             appSettings = app;
         }
 
-        // GET: api/<BroadcastMessageController>
+        // GET: api/<PushMessageController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            return new string[] { "status", "connected" };
+            return Ok("Connected to TCM");
         }
 
-        
-        // POST api/BroadcastMessage
+        // POST api/PushMessage
         [HttpPost]
-        public IActionResult Post([FromBody] BroadcastMessageModel val)
+        public IActionResult Post([FromBody] PushMessageModel val)
         {
-            string result = "Success";
-            var messge = val.messages.Select(x => x.text).First();
+            string result = "success";
             try
             {
-                string BroadcastMessage = appSettings.Value.BroadcastMessageUrl;
-                var client = new RestClient(BroadcastMessage);
-                //client.Timeout = -1;
+                var client = new RestClient(appSettings.Value.PushMessageUrl);
+                client.Timeout = -1;
                 var request = new RestRequest(Method.POST);
                 request.AddHeader("Content-Type", "application/json");
                 request.AddHeader("Authorization", appSettings.Value.LineChannelAccessToken);
-                request.AddParameter("application/json", "{\r\n    \"messages\": [\r\n        {\r\n            \"type\":\"text\",\r\n            \"text\":\""+ messge + "\"\r\n        }\r\n    ]\r\n}", ParameterType.RequestBody);
+                var body = JsonConvert.SerializeObject(val);
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
-
                 HttpStatusCode statusCode = response.StatusCode;
                 if ((int)statusCode != 200)
                 {
@@ -54,9 +54,8 @@ namespace TCMAPI.Controllers
             catch (Exception ex)
             {
                 result = ex.Message;
-                return NotFound(result);
             }
-
+           
             return Ok(result);
         }
 

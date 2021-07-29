@@ -19,5 +19,6 @@ namespace TCMAPI.Models
         public string DeleteRichMenu { get; set; }
         public string PushFlexMessageUrl { get; set; }
         public string BroadcastMessageUrl { get; set; }
+        public string PushMessageUrl { get; set; }
     }
 }
